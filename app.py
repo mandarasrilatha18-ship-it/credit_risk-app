@@ -1,15 +1,10 @@
 import streamlit as st
 import pandas as pd
 import pickle
-import zipfile
 import matplotlib.pyplot as plt
 
-# Unzip model
-with open("Credit_model.zip.pkl","rb") as f:
-    model = pickle.load(f)
-
 # Load model
-with open("Credit_model.pkl","rb") as f:
+with open("Credit_model.pkl", "rb") as f:
     model = pickle.load(f)
 
 st.title("Credit Risk Prediction App")
@@ -31,9 +26,10 @@ if st.button("Predict"):
         st.error("Customer is High Risk")
 
     # Simple graph
-    features = ['Age','Income','Loan','Credit Score']
+    features = ['Age','Annual_Income','Loan_Amount','Credit_Score']
     values = [age, income, loan, credit_score]
 
-    plt.barh(features, values)
-    plt.xlabel("Values")
-    st.pyplot(plt)
+    fig, ax = plt.subplots()
+    ax.barh(features, values)
+    ax.set_xlabel("Values")
+    st.pyplot(fig)
