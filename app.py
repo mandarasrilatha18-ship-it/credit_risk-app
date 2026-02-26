@@ -5,8 +5,8 @@ import zipfile
 import matplotlib.pyplot as plt
 
 # Unzip model
-with zipfile.ZipFile("Credit_model.zip","r") as zip_ref:
-    zip_ref.extractall(".")
+with open("Credit_model.zip.pkl","rb") as f:
+    model = pickle.load(f)
 
 # Load model
 with open("Credit_model.pkl","rb") as f:
