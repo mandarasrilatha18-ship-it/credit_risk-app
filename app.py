@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import pickle
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Load model
 with open("Credit_model.pkl", "rb") as f:
@@ -18,19 +19,17 @@ credit_score = st.number_input("Credit Score")
 
 if st.button("Predict"):
 
-    # Create dataframe for prediction
-    data = pd.DataFrame([[age, income, loan, credit_score]],
-                        columns=['Age','Annual_Income','Loan_Amount','Credit_Score'])
+    # Create input as numpy array (avoids feature name issues)
+    data = np.array([[age, income, loan, credit_score]])
 
     prediction = model.predict(data)[0]
 
-    # Show result
     if prediction == 0:
         st.success("Customer is Low Risk")
     else:
         st.error("Customer is High Risk")
 
-    # Graph: Income, Loan & Credit Score (scaled)
+    # Graph (scaled for clarity)
     features = ['Income (₹ Thousands)', 
                 'Loan (₹ Thousands)', 
                 'Credit Score']
