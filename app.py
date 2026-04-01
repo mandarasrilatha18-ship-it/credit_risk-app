@@ -60,7 +60,6 @@ if st.button("🔍 Analyze Risk"):
 
     st.subheader("📊 Risk Result")
 
-    # Risk percentage (for display)
     risk_percent = 80 if prediction == 1 else 20
 
     if prediction == 0:
@@ -73,19 +72,23 @@ if st.button("🔍 Analyze Risk"):
     features = ["Income (₹ Thousands)", "Loan (₹ Thousands)", "Credit Score"]
     values = [income/1000, loan/1000, credit_score]
 
-    # Centered graph
+    # Centered graph with proper spacing
     col1, col2, col3 = st.columns([1,2,1])
 
     with col2:
-        fig, ax = plt.subplots(figsize=(6,4))
+        fig, ax = plt.subplots(figsize=(7,4))
+
         ax.barh(features, values, color="#0a3d62")
 
         ax.set_title("Risk Indicators", fontsize=12)
         ax.set_xlabel("Scaled Values")
 
+        # Add spacing to prevent overlap
+        ax.set_xlim(0, max(values)*1.2)
+
         # Value labels
         for i, v in enumerate(values):
-            ax.text(v, i, f" {round(v,2)}", va='center')
+            ax.text(v + max(values)*0.02, i, f"{round(v,2)}", va='center')
 
         st.pyplot(fig, use_container_width=False)
 
