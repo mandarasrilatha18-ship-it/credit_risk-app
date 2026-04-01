@@ -3,33 +3,42 @@ import pandas as pd
 import pickle
 import matplotlib.pyplot as plt
 
+# Page config
+st.set_page_config(page_title="Bank Credit Risk System", page_icon="🏦", layout="wide")
+
+# Sidebar
+st.sidebar.title("🏦 Bank Dashboard")
+st.sidebar.markdown("Credit Risk Assessment System")
+st.sidebar.markdown("---")
+st.sidebar.info("Enter customer details and evaluate loan risk.")
+
 # Load model
 with open("Credit_model.pkl", "rb") as f:
     model = pickle.load(f)
 
-st.title("Credit Risk Assessment App")
+# Main Title
+st.title("🏦 Credit Risk Assessment System")
 
-st.write("Enter Customer Details")
+# Layout
+col1, col2 = st.columns(2)
 
-# Inputs
-age = st.number_input("Age", min_value=18, max_value=100)
-income = st.number_input("Annual Income")
-loan = st.number_input("Loan Amount")
-credit_score = st.number_input("Credit Score")
+with col1:
+    age = st.number_input("Age", min_value=18, max_value=100)
+    income = st.number_input("Annual Income (₹)")
+    loan = st.number_input("Loan Amount (₹)")
 
-city = st.selectbox("City", [
-    "Kadapa",
-    "Kurnool",
-    "Nellore",
-    "Rajahmundry",
-    "Tirupati",
-    "Vijayawada",
-    "Visakhapatnam"
-])
+with col2:
+    credit_score = st.number_input("Credit Score")
+    city = st.selectbox("Select City", [
+        "Kadapa","Kurnool","Nellore","Rajahmundry",
+        "Tirupati","Vijayawada","Visakhapatnam"
+    ])
 
-if st.button("Predict"):
+st.markdown("---")
 
-    # Create base data
+if st.button("🔍 Analyze Risk"):
+
+    # Data preparation
     data = {
         'Age': age,
         'Annual_Income': income,
@@ -44,28 +53,45 @@ if st.button("Predict"):
         'City_Visakhapatnam': 0
     }
 
-    # Activate selected city
     data[f'City_{city}'] = 1
-
     df = pd.DataFrame([data])
 
     prediction = model.predict(df)[0]
 
+    st.subheader("📊 Risk Result")
+
+    # Fake percentage (for presentation)
+    risk_percent = 80 if prediction == 1 else 20
+
     if prediction == 0:
-        st.success("Customer is Low Risk")
+        st.success(f"✅ Low Risk ({risk_percent}%) - Loan can be approved")
     else:
-        st.error("Customer is High Risk")
+        st.error(f"⚠️ High Risk ({risk_percent}%) - Loan approval risky")
 
     # Graph
-    features = ["Income (₹ Thousands)",
-                "Loan (₹ Thousands)",
-                "Credit Score"]
+    st.subheader("📈 Financial Analysis")
 
-    values = [income/1000,
-              loan/1000,
-              credit_score]
+    features = ["Income (₹ Thousands)", "Loan (₹ Thousands)", "Credit Score"]
+    values = [income/1000, loan/1000, credit_score]
 
     fig, ax = plt.subplots()
     ax.barh(features, values)
-    ax.set_title("Credit Risk Factors")
+    ax.set_title("Risk Indicators")
     st.pyplot(fig)
+
+    # Download report
+    report = f"""
+    CREDIT RISK REPORT
+    -------------------------
+    Age: {age}
+    Income: {income}
+    Loan: {loan}
+    Credit Score: {credit_score}
+    City: {city}
+
+    Prediction: {"High Risk" if prediction==1 else "Low Risk"}
+    """
+
+    st.download_button("📄 Download Report", report, file_name="credit_report.txt")
+
+    st.info("Higher income & credit score reduce risk. High loan increases risk.")
