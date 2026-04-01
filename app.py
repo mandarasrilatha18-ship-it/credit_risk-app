@@ -16,10 +16,10 @@ st.sidebar.info("Enter customer details and evaluate loan risk.")
 with open("Credit_model.pkl", "rb") as f:
     model = pickle.load(f)
 
-# Main Title
+# Title
 st.title("🏦 Credit Risk Assessment System")
 
-# Layout
+# Input layout
 col1, col2 = st.columns(2)
 
 with col1:
@@ -60,7 +60,7 @@ if st.button("🔍 Analyze Risk"):
 
     st.subheader("📊 Risk Result")
 
-    # Fake percentage (for presentation)
+    # Risk percentage (for display)
     risk_percent = 80 if prediction == 1 else 20
 
     if prediction == 0:
@@ -68,16 +68,26 @@ if st.button("🔍 Analyze Risk"):
     else:
         st.error(f"⚠️ High Risk ({risk_percent}%) - Loan approval risky")
 
-    # Graph
     st.subheader("📈 Financial Analysis")
 
     features = ["Income (₹ Thousands)", "Loan (₹ Thousands)", "Credit Score"]
     values = [income/1000, loan/1000, credit_score]
 
-    fig, ax = plt.subplots()
-    ax.barh(features, values)
-    ax.set_title("Risk Indicators")
-    st.pyplot(fig)
+    # Centered graph
+    col1, col2, col3 = st.columns([1,2,1])
+
+    with col2:
+        fig, ax = plt.subplots(figsize=(6,4))
+        ax.barh(features, values, color="#0a3d62")
+
+        ax.set_title("Risk Indicators", fontsize=12)
+        ax.set_xlabel("Scaled Values")
+
+        # Value labels
+        for i, v in enumerate(values):
+            ax.text(v, i, f" {round(v,2)}", va='center')
+
+        st.pyplot(fig, use_container_width=False)
 
     # Download report
     report = f"""
@@ -94,4 +104,4 @@ if st.button("🔍 Analyze Risk"):
 
     st.download_button("📄 Download Report", report, file_name="credit_report.txt")
 
-    st.info("Higher income & credit score reduce risk. High loan increases risk.")
+    st.info("Higher income & credit score reduce risk, while higher loan increases risk.")
